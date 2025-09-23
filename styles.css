@@ -101,7 +101,7 @@ section > h2::after{ content:""; position:absolute; left:0; bottom:-6px; width:6
 .grid.two{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
 /* 移动端顶部导航 */
-.mobile-tabs{ display:none; position:sticky; top:60px; z-index:25; background: linear-gradient(180deg, rgba(11,16,24,.96), rgba(11,16,24,.85)); border-bottom:1px solid var(--border); }
+.mobile-tabs{ display:none; position:sticky; top:64px; z-index:25; background: linear-gradient(180deg, rgba(11,16,24,.96), rgba(11,16,24,.85)); border-bottom:1px solid var(--border); }
 .mobile-tabs .tabs-inner{ display:flex; gap:8px; overflow:auto; padding:8px 12px; }
 .mobile-tabs a{ white-space:nowrap; color:var(--muted); text-decoration:none; border:1px solid var(--border); padding:6px 10px; border-radius:999px; }
 .mobile-tabs a.active{ color:var(--text); border-color:var(--primary); }
