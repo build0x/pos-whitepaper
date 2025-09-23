@@ -15,7 +15,7 @@
     tocEl.appendChild(a);
   });
 
-  // 平滑滚动 & 高亮
+  // 平滑滚动 & 高亮（使用 scrollIntoView + section 的 scroll-margin-top）
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
     if(!a) return;
@@ -23,11 +23,25 @@
     const target = document.getElementById(id);
     if(target){
       e.preventDefault();
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 110, behavior: 'smooth' });
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 
   const links = Array.from(tocEl.querySelectorAll('a'));
+  // 同步移动端chips点击跳转
+  // DOM 就绪后单独绑定移动端导航点击，确保在设备切换时仍可用
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.mobile-tabs a').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        const id = a.getAttribute('href').slice(1);
+        const target = document.getElementById(id);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  });
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if(entry.isIntersecting){
