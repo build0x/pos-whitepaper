@@ -21,7 +21,6 @@
         <div class="actions">
           <div class="cta">
             <a class="btn primary" href="#how">立即参与</a>
-            <button id="copyAddress" class="btn ghost">复制合约地址</button>
           </div>
           <div class="social">
             <a class="btn ghost small" href="https://t.me/POSToken1" target="_blank" rel="noopener" aria-label="Telegram">Telegram</a>
@@ -29,9 +28,12 @@
           </div>
         </div>
       </div>
-      <div class="contract container">
-        <span>代币合约地址</span>
-        <code id="contractAddress">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</code>
+      <div class="contract-address container">
+        <div class="label">代币合约地址</div>
+        <div class="address-container">
+          <div class="address-text" id="contractAddress">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</div>
+          <button class="copy-btn" data-copy="0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D">复制</button>
+        </div>
       </div>
     </header>
 
@@ -179,10 +181,12 @@
           <div class="card">
             <div class="grid two">
               <div>
-                <p>合约地址：</p>
-                <div class="address-line">
-                  <code class="mono">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</code>
-                  <button class="ghost small" data-copy="0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D">复制</button>
+                <div class="contract-address">
+                  <div class="label">合约地址：</div>
+                  <div class="address-container">
+                    <div class="address-text" id="contractAddress2">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</div>
+                    <button class="copy-btn" data-copy="0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D">复制</button>
+                  </div>
                 </div>
                 <ul class="dash">
                   <li>标准：ERC-20</li>
@@ -191,10 +195,12 @@
                 </ul>
               </div>
               <div>
-                <p>矿池（挖矿合约）地址：</p>
-                <div class="address-line">
-                  <code id="poolAddress" class="mono">0xCf646905C204c240381E0Cbf759D6d7A643ce914</code>
-                  <button class="ghost small" data-copy="0xCf646905C204c240381E0Cbf759D6d7A643ce914">复制</button>
+                <div class="contract-address">
+                  <div class="label">矿池（挖矿合约）地址：</div>
+                  <div class="address-container">
+                    <div class="address-text" id="poolAddress">0xCf646905C204c240381E0Cbf759D6d7A643ce914</div>
+                    <button class="copy-btn" data-copy="0xCf646905C204c240381E0Cbf759D6d7A643ce914">复制</button>
+                  </div>
                 </div>
                 <p style="margin-top:10px;">透明性声明：</p>
                 <ul class="dash">
