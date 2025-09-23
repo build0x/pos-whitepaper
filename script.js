@@ -1,287 +1,269 @@
-// 目录生成、滚动与复制
-(function(){
-  const tocEl = document.getElementById('toc');
-  const sections = Array.from(document.querySelectorAll('main section'));
-  const url = new URL(location.href);
-  const addrFromUrl = url.searchParams.get('token');
-  const poolFromUrl = url.searchParams.get('pool');
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>POS 白皮书</title>
+    <meta name="description" content="POS 项目白皮书：愿景、机制、参与步骤、激励与合约信息。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero" id="top">
+      <div class="brand container">
+        <div class="brand-left">
+          <div class="logo" aria-hidden="true">POS</div>
+          <div class="titles">
+            <h1>转一笔就开挖 · 全链互助挖矿</h1>
+            <p class="subtitle">无 APP、无 DApp、无权限：向合约转入，24 小时自动结算收益</p>
+          </div>
+        </div>
+        <div class="actions">
+          <div class="cta">
+            <a class="btn primary" href="#how">立即参与</a>
+            <button id="copyAddress" class="btn ghost">复制合约地址</button>
+          </div>
+          <div class="social">
+            <a class="btn ghost small" href="https://t.me/POSToken1" target="_blank" rel="noopener" aria-label="Telegram">Telegram</a>
+            <a class="btn ghost small" href="https://twitter.com/POSToken1" target="_blank" rel="noopener" aria-label="Twitter">Twitter</a>
+          </div>
+        </div>
+      </div>
+      <div class="contract container">
+        <span>代币合约地址</span>
+        <code id="contractAddress">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</code>
+      </div>
+    </header>
 
-  // 生成目录
-  sections.forEach(sec => {
-    const title = sec.dataset.title || sec.querySelector('h2')?.textContent || 'Section';
-    const a = document.createElement('a');
-    a.href = `#${sec.id}`;
-    a.textContent = title;
-    tocEl.appendChild(a);
-  });
+    <div class="layout">
+      <aside class="toc" aria-label="目录">
+        <nav id="toc"></nav>
+      </aside>
 
-  // 平滑滚动 & 高亮
-  document.addEventListener('click', (e) => {
-    const a = e.target.closest('a[href^="#"]');
-    if(!a) return;
-    const id = a.getAttribute('href').slice(1);
-    const target = document.getElementById(id);
-    if(target){
-      e.preventDefault();
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 110, behavior: 'smooth' });
-    }
-  });
+      <main class="content" id="content">
+        <section id="intro" data-title="项目简介">
+          <h2>项目简介</h2>
+          <p>
+            POS 是一种完全运行在链上的互助挖矿范式：用户仅需向指定合约地址转入代币，即自动加入挖矿队列；24 小时后由“挖矿合约矿池地址”直接把收益转回到你的钱包。全程不需要 APP 或 DApp，也无需授权与签名，极简且可验证。
+          </p>
+          <div class="grid two">
+            <div class="card">
+              <h3>为什么与众不同</h3>
+              <ul>
+                <li>转账即参与：无入口、无学习成本，新手 1 分钟上手</li>
+                <li>24 小时自动结算：收益由矿池地址直接打回，省心省时</li>
+                <li>全程可验证：任何一次分配都能在链上查到交易与事件</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>价值主张</h3>
+              <ul>
+                <li>更低门槛：无需连接钱包、无需授权与许可</li>
+                <li>更强透明：收益结算路径清晰，拒绝黑箱</li>
+                <li>更高扩散：邀请与互助机制，形成自驱动增长</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
-  const links = Array.from(tocEl.querySelectorAll('a'));
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${entry.target.id}`));
-      }
-    });
-  }, { rootMargin: '-40% 0px -50% 0px', threshold: [0, 1] });
-  sections.forEach(sec => obs.observe(sec));
+        <section id="problem" data-title="核心痛点与解决方案">
+          <h2>核心痛点与解决方案</h2>
+          <div class="card">
+            <ul class="checklist">
+              <li>参与门槛高、操作复杂 → 转账即参与，无需授权/签名/APP</li>
+              <li>收益不透明、信任成本高 → 矿池直付收益，所有转账与事件链上可验</li>
+              <li>拉新弱、增长慢 → 开户 2000 POS 获 6000 额度，直推/团队分润驱动裂变</li>
+              <li>收益节奏不可控 → 固定循环：入池 3000→24 小时→5 POL 触发回款 3080，直至赚满 6000 出局</li>
+              <li>关系混乱、难以追踪 → 2→1 POL 个人绑定，3.2→1.2 POL 团队绑定，交易备注/事件展示团队信息；只考核直推、人数自动升级</li>
+            </ul>
+          </div>
+        </section>
 
-  // 移动端目录按钮
-  const toggleBtn = document.getElementById('toggleToc');
-  toggleBtn?.addEventListener('click', ()=>{
-    const toc = document.querySelector('.toc');
-    const mask = document.getElementById('drawerMask');
-    if(!toc) return;
-    const isOpen = toc.classList.contains('drawer');
-    if(isOpen){
-      toc.classList.remove('drawer');
-      mask.hidden = true;
-      toc.style.display = 'none';
-    }else{
-      toc.style.display = 'block';
-      toc.classList.add('drawer');
-      mask.hidden = false;
-    }
-  });
+        <section id="how" data-title="如何参与">
+          <h2>如何参与</h2>
+          <div class="steps">
+            <div class="step card">
+              <h3>Step 1 · 开户 2000 POS</h3>
+              <p>向“开户合约地址”转入 <strong>2000 POS</strong> 获得挖矿资格，同时获得 <strong>6000 POS 收益额度</strong>。</p>
+            </div>
+            <div class="step card">
+              <h3>Step 2 · 进入矿池 3000 POS</h3>
+              <p>向“挖矿合约矿池地址”转入 <strong>3000 POS</strong>，等待 <strong>24 小时</strong>。</p>
+            </div>
+            <div class="step card">
+              <h3>Step 3 · 5 POL 触发回款</h3>
+              <p>24 小时后，再向矿池地址转 <strong>5 POL</strong>（用于触发回款），矿池将 <strong>自动返还 3080 POS</strong> 至你的钱包。</p>
+            </div>
+          </div>
+          <div class="card" style="margin-top:12px;">
+            <p><strong>循环玩法：</strong>将收到的 3080 POS 中的 3000 POS 再次转入矿池，继续等待 24 小时并用 5 POL 触发回款，再返 <strong>3080 POS</strong>。重复此循环，直到赚满 <strong>6000 POS</strong> 出局。若想继续，可再次向开户合约转入 2000 POS 重新获得 6000 额度。</p>
+            <ul class="dash">
+              <li>单笔参与：<strong>一次仅 3000 POS</strong></li>
+              <li>频率限制：<strong>单钱包每天仅可参与一次</strong></li>
+            </ul>
+          </div>
+        </section>
 
-  // 点击遮罩关闭抽屉
-  document.getElementById('drawerMask')?.addEventListener('click', ()=>{
-    const toc = document.querySelector('.toc');
-    if(toc){ toc.classList.remove('drawer'); toc.style.display='none'; }
-    const mask = document.getElementById('drawerMask');
-    if(mask) mask.hidden = true;
-  });
+        <section id="rewards" data-title="互助激励机制">
+          <h2>互助激励机制</h2>
+          <div class="card">
+            <p>互助网络通过直推与等级分润形成正向循环——更快扩散，更稳共识，更可持续。</p>
+            <div class="grid two">
+              <div>
+                <h3>直推与团队收益</h3>
+                <ul>
+                  <li>直推示例：转入 2000 POS，可获 30%（600 POS）直推奖励</li>
+                  <li>二、三级团队各享 20% / 10% 分润（以合约参数为准）</li>
+                  <li>等级收益按 V1–V9 阶梯释放，支持复投放大效应</li>
+                </ul>
+              </div>
+              <div>
+                <h3>等级与团队分润</h3>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>等级</th>
+                        <th>团队有效地址</th>
+                        <th>团队收益奖励</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>V1</td><td>10</td><td>10%</td></tr>
+                      <tr><td>V2</td><td>30</td><td>15%</td></tr>
+                      <tr><td>V3</td><td>100</td><td>20%</td></tr>
+                      <tr><td>V4</td><td>300</td><td>25%</td></tr>
+                      <tr><td>V5</td><td>600</td><td>30%</td></tr>
+                      <tr><td>V6</td><td>1200</td><td>35%</td></tr>
+                      <tr><td>V7</td><td>2000</td><td>40%</td></tr>
+                      <tr><td>V8</td><td>3000</td><td>45%</td></tr>
+                      <tr><td>V9</td><td>4000</td><td>50%</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
 
-  // 复制合约地址
-  function copy(text){
-    navigator.clipboard?.writeText(text).then(()=>{
-      toast('已复制到剪贴板');
-    }).catch(()=>{
-      const area = document.createElement('textarea');
-      area.value = text; document.body.appendChild(area); area.select();
-      try{ document.execCommand('copy'); toast('已复制到剪贴板'); }finally{ area.remove(); }
-    });
-  }
-  const copyBtn = document.getElementById('copyAddress');
-  const addrEl = document.getElementById('contractAddress');
-  if(addrFromUrl && addrEl){ addrEl.textContent = addrFromUrl; }
-  const poolEl = document.getElementById('poolAddress');
-  if(poolFromUrl && poolEl){ poolEl.textContent = poolFromUrl; }
-  const addr = addrEl?.textContent?.trim();
-  copyBtn?.addEventListener('click', ()=> copy(addr));
-  document.querySelectorAll('[data-copy]')?.forEach(btn => btn.addEventListener('click', ()=> copy(btn.getAttribute('data-copy'))));
+            <hr style="border:none; border-top:1px solid var(--border); margin:16px 0;" />
+            <h3 style="margin:0 0 8px;">关系绑定说明</h3>
+            <ul class="dash">
+              <li>绑定触发：<strong>邀请人先向被邀请人转 2 POL，被邀请人回转 1 POL</strong>，即视为地址绑定成功</li>
+              <li>绑定一经确认不可更改，链上记录可查</li>
+              <li>异常地址由合约自动剔除，保障公平与收益安全</li>
+            </ul>
 
-  // 年份
-  const yearEl = document.getElementById('year');
-  if(yearEl) yearEl.textContent = new Date().getFullYear();
+            <h3 style="margin:12px 0 6px;">团队绑定规则</h3>
+            <ul class="dash">
+              <li><strong>只考核直推：</strong>你直推的地址均计入你的团队</li>
+              <li><strong>自动升级：</strong>团队有效人数达标后自动升级相应等级</li>
+              <li><strong>绑定触发（团队）：</strong>向挖矿合约地址转 <strong>3.2 POL</strong>，合约自动回执 <strong>1.2 POL</strong>，并附带团队信息（见事件/备注），视为团队绑定完成</li>
+            </ul>
+          </div>
+        </section>
 
-  // 简易吐司
-  function toast(message){
-    const t = document.createElement('div');
-    t.textContent = message;
-    Object.assign(t.style, {
-      position:'fixed', bottom:'26px', left:'50%', transform:'translateX(-50%)',
-      background:'rgba(17,24,39,.9)', color:'#e7eef7', padding:'10px 14px', borderRadius:'12px',
-      border:'1px solid rgba(255,255,255,.16)', zIndex:50, transition:'opacity .3s', opacity:'0'
-    });
-    document.body.appendChild(t);
-    requestAnimationFrame(()=> t.style.opacity = '1');
-    setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=> t.remove(), 300); }, 1600);
-  }
-})();
+        <section id="token" data-title="代币与合约信息">
+          <h2>代币与合约信息</h2>
+          <div class="card">
+            <div class="grid two">
+              <div>
+                <p>合约地址：</p>
+                <div class="address-line">
+                  <code class="mono">0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D</code>
+                  <button class="ghost small" data-copy="0xD631DFa36526e554d29C7e726F08dEcD6052Ea9D">复制</button>
+                </div>
+                <ul class="dash">
+                  <li>标准：ERC-20</li>
+                  <li>精度：18</li>
+                  <li>税费：0（如有变更以合约为准）</li>
+                </ul>
+              </div>
+              <div>
+                <p>矿池（挖矿合约）地址：</p>
+                <div class="address-line">
+                  <code id="poolAddress" class="mono">0xCf646905C204c240381E0Cbf759D6d7A643ce914</code>
+                  <button class="ghost small" data-copy="0xCf646905C204c240381E0Cbf759D6d7A643ce914">复制</button>
+                </div>
+                <p style="margin-top:10px;">透明性声明：</p>
+                <ul class="dash">
+                  <li>核心逻辑完全上链、开源审计后更新</li>
+                  <li>关键参数链上治理提案表决</li>
+                  <li>所有分配均可在区块浏览器验证</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
 
-// 导出为 PPT
-(function(){
-  const btn = document.getElementById('exportPpt');
-  if(!btn) return;
+        
 
-  function loadScript(src){
-    return new Promise((resolve, reject)=>{
-      const s = document.createElement('script');
-      s.src = src; s.async = true; s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
+        <section id="roadmap" data-title="路线图">
+          <h2>路线图</h2>
+          <div class="timeline card">
+            <ol>
+              <li><strong>Q1</strong> 主网发布；开户与挖矿合约上线；完成第三方审计；注入基础流动性</li>
+              <li><strong>Q2</strong> 团队绑定与等级体系上线；移动端极简参与指引；渠道合作与社群增长</li>
+              <li><strong>Q3</strong> 多链部署（如 BNB/Arbitrum/Base）；节点与邀请赛活动；数据看板上线</li>
+              <li><strong>Q4</strong> 品牌与商务合作；合规探索；全球化扩张与长期激励计划</li>
+            </ol>
+          </div>
+        </section>
 
-  async function ensureLibLoaded(){
-    if(typeof PptxGenJS !== 'undefined') return true;
-    try{
-      await loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js');
-      return typeof PptxGenJS !== 'undefined';
-    }catch(e){ return false; }
-  }
+        
 
-  async function ensureHtml2Canvas(){
-    if(typeof html2canvas !== 'undefined') return true;
-    try{
-      await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
-      return typeof html2canvas !== 'undefined';
-    }catch(e){ return false; }
-  }
+        <section id="faq" data-title="常见问题">
+          <h2>常见问题</h2>
+          <details class="card">
+            <summary>如何验证合约与收益分配？</summary>
+            <p>在区块浏览器查看交易与合约事件日志，所有分配均由链上事件触发并可验证。</p>
+          </details>
+          <details class="card">
+            <summary>是否支持复投？</summary>
+            <p>支持。可在领取收益后通过合约入口一键复投，提高长期收益率。</p>
+          </details>
+          <details class="card">
+            <summary>如何开始？最低额度与频率限制是什么？</summary>
+            <p>先向开户合约转 <strong>2000 POS</strong> 获取资格与 <strong>6000 POS</strong> 收益额度；入矿固定为 <strong>3000 POS/次</strong>；<strong>单钱包每天仅可参与一次</strong>。</p>
+          </details>
+          <details class="card">
+            <summary>为何要转 5 POL？会被扣吗？</summary>
+            <p>5 POL 仅用于 <strong>触发回款</strong> 的合约调用，进行购买POS拉盘并且销毁到黑洞地址。</p>
+          </details>
+          <details class="card">
+            <summary>绑定关系如何确认？</summary>
+            <p>个人绑定：<strong>邀请人转 2 POL，被邀请人回 1 POL</strong> 即在链上确认；团队信息查询方式：向矿池转 <strong>3.2 POL</strong> 完成团队绑定后，前往钱包的交易详情查看 <strong>备注/事件日志</strong>，即可看到团队人数、等级等信息（合约会回执 <strong>1.2 POL</strong>）。</p>
+          </details>
+          <details class="card">
+            <summary>赚满 6000 POS 后如何继续？</summary>
+            <p>出局后可再次向开户合约转 <strong>2000 POS</strong> 重新获得新一轮 <strong>6000 POS</strong> 收益额度，再按三步循环参与。</p>
+          </details>
+          <details class="card">
+            <summary>忘记通过邀请参与，是否还能补绑？</summary>
+            <p>地址绑定一经确认不可修改；未绑定前可按上述规则完成绑定，已绑定后无法变更。</p>
+          </details>
+          <details class="card">
+            <summary>支持哪些钱包/终端？</summary>
+            <p>任何能向链上地址转账的 Polygon 钱包均可；全程无需 DApp 与授权，移动端和桌面端均可直接转账参与。</p>
+          </details>
+        </section>
 
-  async function ensureDomToImage(){
-    if(typeof domtoimage !== 'undefined') return true;
-    try{
-      await loadScript('https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.0/dist/dom-to-image-more.min.js');
-      return typeof domtoimage !== 'undefined';
-    }catch(e){ return false; }
-  }
+        <footer class="footer">
+          <div class="foot-grid">
+            <div>
+              <div class="logo small">POS</div>
+              <p>开放、透明、可验证的链上经济体。</p>
+            </div>
+            <div>
+              <a href="#top" class="ghost small">回到顶部</a>
+            </div>
+          </div>
+          <p class="copyright">© <span id="year"></span> POS. All rights reserved.</p>
+        </footer>
+      </main>
+    </div>
 
-  btn.addEventListener('click', async () => {
-    const ok = await ensureLibLoaded();
-    if(!ok){
-      alert('PPT 导出库加载失败，请检查网络后重试，或换用“打印→另存为 PDF”。');
-      return;
-    }
-    alert('正在生成 PPT（结构化版本），请稍候 1-3 秒…');
-    const pptx = new PptxGenJS();
-    pptx.defineLayout({ name:'LAYOUT_WIDE', width:13.33, height:7.5 });
-    pptx.layout = 'LAYOUT_WIDE';
-
-    // 样式
-    const titleStyle = { x:0.6, y:0.6, w:12, fontSize:34, bold:true, color:'FFFFFF' };
-    const subStyle = { x:0.6, y:1.4, w:12, fontSize:18, color:'BFD3FF' };
-    const h2Style = { x:0.6, y:0.6, w:12, fontSize:28, bold:true, color:'FFFFFF' };
-    const listStyle = { x:0.8, y:1.4, w:11.6, fontSize:18, color:'FFFFFF', bullet:true, lineSpacingMultiple:1.2 };
-    const slideBg = { color:'1B2433' };
-
-    try{
-      // 封面
-      const ttl = document.querySelector('.titles h1')?.textContent || 'POS 白皮书';
-      const sub = document.querySelector('.subtitle')?.textContent || '';
-      let slide = pptx.addSlide();
-      slide.background = slideBg;
-      slide.addText(ttl, titleStyle);
-      if(sub) slide.addText(sub, subStyle);
-
-      function addListSlide(sectionSelector, titleText, items){
-        const s = pptx.addSlide(); s.background = slideBg;
-        s.addText(titleText, h2Style);
-        s.addText(items, listStyle);
-      }
-
-      // 项目简介（从 intro 两张卡片汇总）
-      const why = Array.from(document.querySelectorAll('#intro .card:nth-of-type(1) li')).map(li=>li.textContent.trim());
-      const values = Array.from(document.querySelectorAll('#intro .card:nth-of-type(2) li')).map(li=>li.textContent.trim());
-      addListSlide('#intro', '项目简介 · 为什么与众不同', why);
-      addListSlide('#intro', '项目简介 · 价值主张', values);
-
-      // 核心痛点与解决方案
-      const pains = Array.from(document.querySelectorAll('#problem li')).map(li=>li.textContent.trim());
-      addListSlide('#problem', '核心痛点与解决方案', pains);
-
-      // 如何参与（步骤）
-      const steps = Array.from(document.querySelectorAll('#how .step')).map(step=>{
-        const h = step.querySelector('h3')?.textContent?.trim() || '';
-        const p = step.querySelector('p')?.textContent?.trim() || '';
-        return `${h}：${p}`;
-      });
-      addListSlide('#how', '如何参与', steps);
-
-      // 激励机制（左侧要点 + 右侧表格）
-      const rewards = Array.from(document.querySelectorAll('#rewards .grid li')).map(li=>li.textContent.trim());
-      addListSlide('#rewards', '互助激励机制 · 要点', rewards);
-      // 表格
-      const rows = Array.from(document.querySelectorAll('#rewards table tbody tr')).map(tr=>{
-        const tds = Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim());
-        return tds;
-      });
-      const tableSlide = pptx.addSlide(); tableSlide.background = slideBg;
-      tableSlide.addText('互助激励机制 · 等级表', h2Style);
-      tableSlide.addTable([
-        [{ text:'等级', options:{bold:true}}, {text:'团队有效地址', options:{bold:true}}, {text:'团队收益奖励', options:{bold:true}}],
-        ...rows
-      ], { x:0.8, y:1.4, w:11.6, colW:[2.2,4.8,4.6], fontSize:16, color:'FFFFFF', border:{type:'solid', color:'6B6F7B', pt:1} });
-
-      // 合约与矿池
-      const tokenAddr = document.getElementById('contractAddress')?.textContent?.trim() || '';
-      const poolAddr = document.getElementById('poolAddress')?.textContent?.trim() || '';
-      const tokenSlide = pptx.addSlide(); tokenSlide.background = slideBg;
-      tokenSlide.addText('代币与合约信息', h2Style);
-      tokenSlide.addText([`代币合约：${tokenAddr}`, `矿池地址：${poolAddr}`, '标准：ERC-20 · 精度：18'], { ...listStyle, bullet:false });
-
-      // 路线图
-      const roadmap = Array.from(document.querySelectorAll('#roadmap li')).map(li=>li.textContent.trim());
-      addListSlide('#roadmap', '路线图', roadmap);
-
-      // FAQ
-      const faqs = Array.from(document.querySelectorAll('#faq details')).map(d=>{
-        const q = d.querySelector('summary')?.textContent?.trim() || '';
-        const a = d.querySelector('p')?.textContent?.trim() || '';
-        return `${q}：${a}`;
-      });
-      addListSlide('#faq', '常见问题（节选）', faqs);
-
-      // 兼容下载：优先使用 blob，再手动触发保存
-      if(pptx.write){
-        const blob = await pptx.write('blob');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'POS-白皮书.pptx';
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(()=> URL.revokeObjectURL(url), 1500);
-      }else{
-        await pptx.writeFile({ fileName: 'POS-白皮书.pptx' });
-      }
-      alert('PPT 已生成，如未看到下载，请允许浏览器下载。');
-    }catch(err){
-      console.error(err);
-      alert('生成失败：' + (err?.message || err) + '\n可先用 “Ctrl+P → 另存为 PDF” 作为临时方案。');
-    }
-  });
-})();
-
-// 导出整页为高清PNG
-(function(){
-  function init(){
-    const btn = document.getElementById('exportPoster');
-    if(!btn) return false;
-
-  function loadScript(src){
-    return new Promise((resolve, reject)=>{
-      const s = document.createElement('script');
-      s.src = src; s.async = true; s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-
-  async function ensureHtml2Canvas(){
-    if(typeof html2canvas !== 'undefined') return true;
-    try{ await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'); return true; }
-    catch(e){ return false; }
-  }
-
-  btn.addEventListener('click', async () => {
-    const ok = await ensureHtml2Canvas();
-    if(!ok){ alert('截图库加载失败，请联网后重试'); return; }
-    const main = document.querySelector('main');
-    if(!main){ alert('未找到主要内容'); return; }
-    // 展开所有 details 以截图
-    const opened = [];
-    document.querySelectorAll('details').forEach(d=>{ if(!d.open){ d.open = true; opened.push(d); } });
-    const canvas = await html2canvas(main, { backgroundColor:'#0a0f16', scale:3, useCORS:true, windowWidth: document.body.scrollWidth, windowHeight: main.scrollHeight });
-    const url = canvas.toDataURL('image/png');
-    const a = document.createElement('a'); a.href = url; a.download = 'POS_长图海报.png'; document.body.appendChild(a); a.click(); a.remove();
-    opened.forEach(d=> d.open = false);
-  });
-    return true;
-  }
-  if(!init()){
-    document.addEventListener('DOMContentLoaded', init, { once:true });
-  }
-})();
-
-// 交易可视化模块已按需求移除
-
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+  </html>
 
